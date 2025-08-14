@@ -58,6 +58,14 @@ class Produit(models.Model):
     categorie = models.ForeignKey(Categorie, on_delete=models.CASCADE)
     vendeur = models.ForeignKey(Vendeur, on_delete=models.CASCADE)
     statut = models.CharField(max_length=100, default="disponible")
+    en_promotion = models.BooleanField(default=False)
+    prix_promotion = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    image = models.ImageField(upload_to='produits/', null=True, blank=True)
+    actif = models.BooleanField(default=True)
+
+    @property
+    def promotion_active(self):
+        return self.en_promotion and self.prix_promotion is not None
 
 class RemiseProposee(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
@@ -82,7 +90,21 @@ class PanierItem(models.Model):
 class Commande(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    statut = models.CharField(max_length=50, default="en_attente")
+    STATUT_CHOICES = [
+        ('en_attente', 'En attente'),
+        ('validee', 'Validée'),
+        ('expediee', 'Expédiée'),
+        ('livree', 'Livrée'),
+        ('annulee', 'Annulée'),
+    ]
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default="en_attente")
+    montant_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def calculer_montant_total(self):
+        total = sum(item.prix * item.quantite for item in self.commandeitem_set.all())
+        self.montant_total = total
+        self.save()
+        return total
 
 class CommandeItem(models.Model):
     commande = models.ForeignKey(Commande, on_delete=models.CASCADE)

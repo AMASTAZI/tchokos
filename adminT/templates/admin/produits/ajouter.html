@@ -1,0 +1,285 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Ajouter un produit - Tchokos Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'admin_panel:produits_list' %}">Produits</a></li>
+    <li class="breadcrumb-item active">Ajouter</li>
+{% endblock %}
+
+{% block page_title %}
+    <i class="fas fa-plus"></i> Ajouter un Produit
+{% endblock %}
+
+{% block page_actions %}
+    <a href="{% url 'admin_panel:produits_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-plus-circle"></i> Nouveau Produit
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!-- Informations principales -->
+                            <div class="mb-4">
+                                <h5 class="text-primary"><i class="fas fa-info-circle"></i> Informations principales</h5>
+                                <hr>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.nom.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag"></i> Nom du produit <span class="text-danger">*</span>
+                                </label>
+                                {{ form.nom }}
+                                {% if form.nom.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nom.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">
+                                    <i class="fas fa-align-left"></i> Description
+                                </label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.description.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.prix.id_for_label }}" class="form-label">
+                                            <i class="fas fa-money-bill"></i> Prix (FCFA) <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            {{ form.prix }}
+                                            <span class="input-group-text">FCFA</span>
+                                        </div>
+                                        {% if form.prix.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.prix.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.stock.id_for_label }}" class="form-label">
+                                            <i class="fas fa-boxes"></i> Quantité en stock <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.stock }}
+                                        {% if form.stock.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.stock.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <!-- Image du produit -->
+                            <div class="mb-4">
+                                <h5 class="text-primary"><i class="fas fa-image"></i> Image du produit</h5>
+                                <hr>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="text-center">
+                                    <div class="image-preview-container" style="width: 200px; height: 200px; margin: 0 auto; border: 2px dashed #dee2e6; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                                        <img id="imagePreview" src="" alt="Aperçu" style="max-width: 100%; max-height: 100%; display: none; border-radius: 6px;">
+                                        <div id="imagePlaceholder" class="text-muted text-center">
+                                            <i class="fas fa-image fa-3x mb-2"></i>
+                                            <p>Cliquez pour ajouter une image</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <input type="file" class="form-control mt-3" id="imageInput" name="image" accept="image/*" data-preview="imagePreview">
+                                <small class="form-text text-muted">
+                                    Formats acceptés: JPG, PNG, GIF (Max: 5MB)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Catégorisation et statut -->
+                    <div class="mb-4">
+                        <h5 class="text-primary"><i class="fas fa-layer-group"></i> Catégorisation</h5>
+                        <hr>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.categorie.id_for_label }}" class="form-label">
+                                    <i class="fas fa-folder"></i> Catégorie <span class="text-danger">*</span>
+                                </label>
+                                {{ form.categorie }}
+                                {% if form.categorie.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.categorie.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.vendeur.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-tie"></i> Vendeur <span class="text-danger">*</span>
+                                </label>
+                                {{ form.vendeur }}
+                                {% if form.vendeur.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.vendeur.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.statut.id_for_label }}" class="form-label">
+                                    <i class="fas fa-toggle-on"></i> Statut
+                                </label>
+                                {{ form.statut }}
+                                {% if form.statut.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.statut.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'admin_panel:produits_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Enregistrer le produit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview functionality
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePlaceholder = document.getElementById('imagePlaceholder');
+    const previewContainer = document.querySelector('.image-preview-container');
+    
+    // Make the preview container clickable
+    previewContainer.addEventListener('click', function() {
+        imageInput.click();
+    });
+    
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        
+        if (file) {
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('L\'image est trop volumineuse. Taille maximale: 5MB');
+                this.value = '';
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner une image valide');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.style.display = 'none';
+            imagePlaceholder.style.display = 'block';
+        }
+    });
+    
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Scroll to first error
+            const firstError = form.querySelector('.is-invalid, :invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+        
+        form.classList.add('was-validated');
+    });
+    
+    // Real-time validation
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        field.addEventListener('blur', function() {
+            if (this.checkValidity()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+    });
+    
+    // Price formatting
+    const prixInput = document.getElementById('{{ form.prix.id_for_label }}');
+    prixInput.addEventListener('input', function() {
+        // Remove non-numeric characters except decimal point
+        let value = this.value.replace(/[^\d.]/g, '');
+        
+        // Ensure only one decimal point
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        this.value = value;
+    });
+});
+</script>
+{% endblock %}

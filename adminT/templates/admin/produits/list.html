@@ -1,0 +1,253 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des produits - Tchokos Admin{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Produits</li>
+{% endblock %}
+
+{% block page_title %}
+    <i class="fas fa-box"></i> Gestion des Produits
+{% endblock %}
+
+{% block page_actions %}
+    <a href="{% url 'admin_panel:ajouter_produit' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Ajouter un produit
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Liste des Produits</h6>
+        <div class="d-flex align-items-center">
+            <div class="input-group me-3" style="width: 250px;">
+                <input type="text" class="form-control" placeholder="Rechercher..." id="searchInput">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                    <i class="fas fa-filter"></i> Filtrer
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="?filtre=stock_bas">Stock bas</a></li>
+                    <li><a class="dropdown-item" href="?filtre=promotion">En promotion</a></li>
+                    <li><a class="dropdown-item" href="?filtre=rupture">Rupture de stock</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="produitsTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Catégorie</th>
+                        <th>Prix (FCFA)</th>
+                        <th>Stock</th>
+                        <th>Vendeur</th>
+                        <th>Promotion</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produit in produits %}
+                    <tr data-produit-id="{{ produit.id }}">
+                        <td>{{ produit.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="product-image me-2">
+                                    <i class="fas fa-image fa-2x text-muted"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ produit.nom }}</div>
+                                    <div class="text-muted small">{{ produit.description|truncatechars:50 }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ produit.categorie.nom }}</span>
+                        </td>
+                        <td class="fw-bold">{{ produit.prix|floatformat:0 }}</td>
+                        <td>
+                            {% if produit.stock == 0 %}
+                                <span class="badge bg-danger">Rupture</span>
+                            {% elif produit.stock < 10 %}
+                                <span class="badge bg-warning text-dark">{{ produit.stock }}</span>
+                            {% else %}
+                                <span class="badge bg-success">{{ produit.stock }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ produit.vendeur.nom }} {{ produit.vendeur.prenom }}</td>
+                        <td>
+                            {% if produit.remisevalidee_set.exists %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-percentage"></i> 
+                                    {{ produit.remisevalidee_set.first.pourcentage }}%
+                                </span>
+                            {% else %}
+                                <span class="text-muted">Non</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if produit.statut == 'disponible' %}
+                                <span class="badge bg-success">Disponible</span>
+                            {% elif produit.statut == 'indisponible' %}
+                                <span class="badge bg-warning text-dark">Indisponible</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ produit.statut }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'admin_panel:modifier_produit' produit.pk %}" 
+                                   class="btn btn-sm btn-outline-primary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger casser-prix-btn" 
+                                        data-produit-id="{{ produit.id }}" 
+                                        data-prix="{{ produit.prix }}" 
+                                        data-nom="{{ produit.nom }}" 
+                                        title="Casser le prix">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+                                <a href="{% url 'admin_panel:supprimer_produit' produit.pk %}" 
+                                   class="btn btn-sm btn-outline-danger" 
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')" 
+                                   title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucun produit trouvé</p>
+                            <a href="{% url 'admin_panel:ajouter_produit' %}" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Ajouter le premier produit
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if produits.has_other_pages %}
+        <nav aria-label="Navigation des pages">
+            <ul class="pagination justify-content-center">
+                {% if produits.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">Première</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produits.previous_page_number }}">Précédente</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ produits.number }} sur {{ produits.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if produits.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produits.next_page_number }}">Suivante</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ produits.paginator.num_pages }}">Dernière</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fonctionnalité de recherche
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('produitsTable');
+    
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const text = row.textContent.toLowerCase();
+            
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+
+    // Gestion du modal "Casser le prix"
+    const casserPrixButtons = document.querySelectorAll('.casser-prix-btn');
+    const modal = document.getElementById('casserPrixModal');
+    
+    casserPrixButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const produitId = this.getAttribute('data-produit-id');
+            const prix = parseFloat(this.getAttribute('data-prix'));
+            const nom = this.getAttribute('data-nom');
+            
+            document.getElementById('produitId').value = produitId;
+            document.getElementById('prixActuel').value = prix.toLocaleString('fr-FR');
+            document.querySelector('#casserPrixModal .modal-title').innerHTML = 
+                '<i class="fas fa-percentage"></i> Casser le prix - ' + nom;
+            
+            // Reset des champs
+            document.getElementById('pourcentageReduction').value = '';
+            document.getElementById('nouveauPrix').value = '';
+            document.getElementById('prixCalcule').textContent = '-';
+            
+            new bootstrap.Modal(modal).show();
+        });
+    });
+    
+    // Calcul automatique du prix
+    const pourcentageInput = document.getElementById('pourcentageReduction');
+    const nouveauPrixInput = document.getElementById('nouveauPrix');
+    const prixCalculeSpan = document.getElementById('prixCalcule');
+    
+    function calculerPrix() {
+        const prixActuel = parseFloat(document.getElementById('prixActuel').value.replace(/\s/g, ''));
+        
+        if (pourcentageInput.value) {
+            const pourcentage = parseFloat(pourcentageInput.value);
+            const nouveauPrix = prixActuel * (100 - pourcentage) / 100;
+            prixCalculeSpan.textContent = nouveauPrix.toLocaleString('fr-FR');
+            nouveauPrixInput.value = '';
+        } else if (nouveauPrixInput.value) {
+            const nouveauPrix = parseFloat(nouveauPrixInput.value);
+            prixCalculeSpan.textContent = nouveauPrix.toLocaleString('fr-FR');
+            pourcentageInput.value = '';
+        } else {
+            prixCalculeSpan.textContent = '-';
+        }
+    }
+    
+    pourcentageInput.addEventListener('input', calculerPrix);
+    nouveauPrixInput.addEventListener('input', calculerPrix);
+});
+</script>
+{% endblock %}
