@@ -1,0 +1,500 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Compte - Tokos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="fw-bold">
+                <i class="fas fa-user me-2 text-primary"></i>Mon Compte
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item active">Mon Compte</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>{{ client.prenom }} {{ client.nom }}
+                    </h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="pill">
+                        <i class="fas fa-user me-2"></i>Profil
+                    </a>
+                    <a href="#orders" class="list-group-item list-group-item-action" data-bs-toggle="pill">
+                        <i class="fas fa-shopping-bag me-2"></i>Mes Commandes
+                        <span class="badge bg-primary ms-auto">{{ commandes|length }}</span>
+                    </a>
+                    <a href="#addresses" class="list-group-item list-group-item-action" data-bs-toggle="pill">
+                        <i class="fas fa-map-marker-alt me-2"></i>Adresses
+                    </a>
+                    <a href="#preferences" class="list-group-item list-group-item-action" data-bs-toggle="pill">
+                        <i class="fas fa-cog me-2"></i>Préférences
+                    </a>
+                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="pill">
+                        <i class="fas fa-shield-alt me-2"></i>Sécurité
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Statistiques</h6>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-0">{{ commandes|length }}</h4>
+                                <small class="text-muted">Commandes</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success mb-0">0</h4>
+                            <small class="text-muted">Points fidélité</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- Profile Tab -->
+                <div class="tab-pane fade show active" id="profile">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user me-2"></i>Informations personnelles
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Prénom *</label>
+                                        <input type="text" class="form-control" value="{{ client.prenom }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nom *</label>
+                                        <input type="text" class="form-control" value="{{ client.nom }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" value="{{ client.email }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Téléphone</label>
+                                        <input type="tel" class="form-control" value="{{ client.telephone }}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Nom d'utilisateur</label>
+                                    <input type="text" class="form-control" value="{{ client.username }}" readonly>
+                                    <small class="text-muted">Le nom d'utilisateur ne peut pas être modifié</small>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-outline-secondary me-2">Annuler</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Enregistrer les modifications
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div class="tab-pane fade" id="orders">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shopping-bag me-2"></i>Mes Commandes
+                            </h5>
+                            <span class="badge bg-primary">{{ commandes|length }} commande{{ commandes|length|pluralize }}</span>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if commandes %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>N° Commande</th>
+                                            <th>Date</th>
+                                            <th>Statut</th>
+                                            <th>Montant</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for commande in commandes %}
+                                        <tr>
+                                            <td>
+                                                <strong>#{{ commande.id|stringformat:"06d" }}</strong>
+                                            </td>
+                                            <td>{{ commande.date|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                {% if commande.statut == 'en_attente' %}
+                                                <span class="badge bg-warning">En attente</span>
+                                                {% elif commande.statut == 'confirme' %}
+                                                <span class="badge bg-info">Confirmée</span>
+                                                {% elif commande.statut == 'expediee' %}
+                                                <span class="badge bg-primary">Expédiée</span>
+                                                {% elif commande.statut == 'livree' %}
+                                                <span class="badge bg-success">Livrée</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <strong class="text-success">
+                                                    {% comment %}{{ commande.total }} FCFA{% endcomment %}
+                                                    - FCFA
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderModal{{ commande.id }}">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                                <h5>Aucune commande</h5>
+                                <p class="text-muted">Vous n'avez pas encore passé de commande.</p>
+                                <a href="{% url 'produits' %}" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-1"></i>Commencer mes achats
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Addresses Tab -->
+                <div class="tab-pane fade" id="addresses">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-map-marker-alt me-2"></i>Mes Adresses
+                            </h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                                <i class="fas fa-plus me-1"></i>Ajouter une adresse
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Default Address -->
+                            <div class="border rounded p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold">Adresse principale
+                                            <span class="badge bg-primary ms-2">Défaut</span>
+                                        </h6>
+                                        <p class="mb-1">{{ client.prenom }} {{ client.nom }}</p>
+                                        <p class="text-muted mb-1">123 Rue Example</p>
+                                        <p class="text-muted mb-1">Yaoundé, Centre, Cameroun</p>
+                                        <p class="text-muted mb-0">Téléphone: {{ client.telephone }}</p>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- No additional addresses message -->
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                                <p>Ajoutez d'autres adresses pour faciliter vos commandes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences Tab -->
+                <div class="tab-pane fade" id="preferences">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cog me-2"></i>Préférences
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <h6 class="mb-3">Notifications</h6>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                                    <label class="form-check-label" for="emailNotif">
+                                        Recevoir les notifications par email
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="promoNotif" checked>
+                                    <label class="form-check-label" for="promoNotif">
+                                        Recevoir les offres promotionnelles
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-4">
+                                    <input class="form-check-input" type="checkbox" id="orderNotif" checked>
+                                    <label class="form-check-label" for="orderNotif">
+                                        Notifications de suivi de commande
+                                    </label>
+                                </div>
+                                
+                                <h6 class="mb-3">Préférences d'affichage</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Langue</label>
+                                    <select class="form-select">
+                                        <option selected>Français</option>
+                                        <option>English</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Devise</label>
+                                    <select class="form-select">
+                                        <option selected>FCFA</option>
+                                        <option>EUR</option>
+                                        <option>USD</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Enregistrer les préférences
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="tab-pane fade" id="security">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shield-alt me-2"></i>Sécurité
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Change Password -->
+                            <h6 class="mb-3">Changer le mot de passe</h6>
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Mot de passe actuel</label>
+                                    <input type="password" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Nouveau mot de passe</label>
+                                    <input type="password" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirmer le nouveau mot de passe</label>
+                                    <input type="password" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-key me-1"></i>Changer le mot de passe
+                                </button>
+                            </form>
+                            
+                            <hr class="my-4">
+                            
+                            <!-- Two-Factor Authentication -->
+                            <h6 class="mb-3">Authentification à deux facteurs</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <p class="mb-1">Sécurisez votre compte avec l'authentification à deux facteurs</p>
+                                    <small class="text-muted">Statut: <span class="text-danger">Désactivée</span></small>
+                                </div>
+                                <button class="btn btn-outline-success">
+                                    <i class="fas fa-mobile-alt me-1"></i>Activer
+                                </button>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <!-- Sessions -->
+                            <h6 class="mb-3">Sessions actives</h6>
+                            <div class="border rounded p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Session actuelle</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-desktop me-1"></i>Navigateur Web • Yaoundé, Cameroun
+                                            <br>Dernière activité: maintenant
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modals -->
+{% for commande in commandes %}
+<div class="modal fade" id="orderModal{{ commande.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Commande #{{ commande.id|stringformat:"06d" }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Date de commande:</strong><br>
+                        {{ commande.date|date:"d/m/Y à H:i" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Statut:</strong><br>
+                        {% if commande.statut == 'en_attente' %}
+                        <span class="badge bg-warning">En attente</span>
+                        {% elif commande.statut == 'confirme' %}
+                        <span class="badge bg-info">Confirmée</span>
+                        {% elif commande.statut == 'expediee' %}
+                        <span class="badge bg-primary">Expédiée</span>
+                        {% elif commande.statut == 'livree' %}
+                        <span class="badge bg-success">Livrée</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Order items would be displayed here -->
+                <h6>Articles commandés:</h6>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Détails des articles à implémenter selon les CommandeItem
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-download me-1"></i>Télécharger la facture
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Add Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter une adresse</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adresse</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ville</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Région</label>
+                            <select class="form-select" required>
+                                <option value="">Choisir...</option>
+                                <option>Centre</option>
+                                <option>Littoral</option>
+                                <option>Ouest</option>
+                                <option>Nord</option>
+                                <option>Sud</option>
+                                <option>Est</option>
+                                <option>Adamaoua</option>
+                                <option>Nord-Ouest</option>
+                                <option>Sud-Ouest</option>
+                                <option>Extrême-Nord</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" class="form-control" required>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="defaultAddress">
+                        <label class="form-check-label" for="defaultAddress">
+                            Définir comme adresse par défaut
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Ajouter l'adresse
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Profile form submission
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Handle profile update
+        alert('Profil mis à jour avec succès !');
+    });
+    
+    // Password strength indicator
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    passwordInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Add password strength logic here
+        });
+    });
+});
+</script>
+{% endblock %}

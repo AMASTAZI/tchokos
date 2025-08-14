@@ -1,0 +1,444 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un compte - Tchokos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tchokos-blue': '#2563eb',
+                        'tchokos-green': '#10b981',
+                        'tchokos-silver': '#94a3b8',
+                        'tchokos-dark': '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .input-focus:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #10b981 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #059669 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .logo-text {
+            background: linear-gradient(135deg, #2563eb 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .error-message {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .success-message {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="max-w-md w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold logo-text mb-2">Tchokos</h1>
+                <h2 class="text-2xl font-semibold text-tchokos-dark mb-2">Créer votre compte</h2>
+                <p class="text-tchokos-silver">Rejoignez notre communauté e-commerce</p>
+            </div>
+            
+            <!-- Formulaire d'inscription -->
+            <div class="bg-white rounded-2xl card-shadow p-8">
+                <form id="signupPost" novalidate method = "POST">
+                    {% csrf_token %}
+                    <!-- Messages d'erreur/succès -->
+                    <div id="errorMessage" class="error-message bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span id="errorText"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="successMessage" class="success-message bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>Compte créé avec succès !</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Nom et Prénom -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="nom" class="block text-sm font-medium text-tchokos-dark mb-2">Nom *</label>
+                            <input 
+                                type="text" 
+                                id="nom" 
+                                name="nom" 
+                                required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition-all duration-300"
+                                placeholder="Votre nom"
+                            >
+                            <span class="text-red-500 text-sm hidden" id="nomError"></span>
+                        </div>
+                        <div>
+                            <label for="prenom" class="block text-sm font-medium text-tchokos-dark mb-2">Prénom *</label>
+                            <input 
+                                type="text" 
+                                id="prenom" 
+                                name="prenom" 
+                                required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition-all duration-300"
+                                placeholder="Votre prénom"
+                            >
+                            <span class="text-red-500 text-sm hidden" id="prenomError"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-tchokos-dark mb-2">Adresse e-mail *</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition-all duration-300"
+                            placeholder="votre@email.com"
+                        >
+                        <span class="text-red-500 text-sm hidden" id="emailError"></span>
+                    </div>
+                    
+                    <!-- Téléphone -->
+                    <div class="mb-4">
+                        <label for="telephone" class="block text-sm font-medium text-tchokos-dark mb-2">Numéro de téléphone *</label>
+                        <input 
+                            type="tel" 
+                            id="telephone" 
+                            name="telephone" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition-all duration-300"
+                            placeholder="+237 6XX XX XX XX"
+                        >
+                        <span class="text-red-500 text-sm hidden" id="telephoneError"></span>
+                    </div>
+                    
+                    <!-- Mot de passe -->
+                    <div class="mb-4">
+                        <label for="motdepasse" class="block text-sm font-medium text-tchokos-dark mb-2">Mot de passe *</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="motdepasse" 
+                                name="mdp" 
+                                required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition-all duration-300 pr-12"
+                                placeholder="••••••••"
+                            >
+                            <button 
+                                type="button" 
+                                id="togglePassword1"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-tchokos-silver hover:text-tchokos-dark transition-colors"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <span class="text-red-500 text-sm hidden" id="motdepasseError"></span>
+                        <div class="text-xs text-tchokos-silver mt-1">
+                            Minimum 8 caractères, incluant au moins une majuscule et un chiffre
+                        </div>
+                    </div>
+                    
+                    <!-- Confirmation mot de passe -->
+                    <div class="mb-6">
+                        <label for="confirmMotdepasse" class="block text-sm font-medium text-tchokos-dark mb-2">Confirmer le mot de passe *</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="confirmMotdepasse" 
+                                name="confirm_mdp" 
+                                required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none input-focus transition-all duration-300 pr-12"
+                                placeholder="••••••••"
+                            >
+                            <button 
+                                type="button" 
+                                id="togglePassword2"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-tchokos-silver hover:text-tchokos-dark transition-colors"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <span class="text-red-500 text-sm hidden" id="confirmMotdepasseError"></span>
+                    </div>
+                    
+                    <!-- Bouton de création de compte -->
+                    <button 
+                        type="submit" 
+                        id="submitBtn"
+                        class="w-full btn-primary text-white font-semibold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span id="btnText">Créer mon compte</span>
+                        <svg id="spinner" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </form>
+                
+                <!-- Lien vers la connexion -->
+                <div class="mt-6 text-center">
+                    <p class="text-tchokos-silver">
+                        Vous avez déjà un compte ? 
+                        <a href="{% url 'login' %}" class="text-tchokos-blue hover:text-tchokos-green font-semibold transition-colors duration-300">
+                            Se connecter
+                        </a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="text-center mt-8">
+                <p class="text-tchokos-silver text-sm">
+                    En créant un compte, vous acceptez nos 
+                    <a href="#" class="text-tchokos-blue hover:underline">Conditions d'utilisation</a> 
+                    et notre 
+                    <a href="#" class="text-tchokos-blue hover:underline">Politique de confidentialité</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId, toggleId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(toggleId);
+            
+            toggle.addEventListener('click', function() {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.innerHTML = `
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                        </svg>
+                    `;
+                } else {
+                    input.type = 'password';
+                    toggle.innerHTML = `
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    `;
+                }
+            });
+        }
+        
+        togglePasswordVisibility('motdepasse', 'togglePassword1');
+        togglePasswordVisibility('confirmMotdepasse', 'togglePassword2');
+        
+        // Form validation
+        const form = document.getElementById('signupPost');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const errorText = document.getElementById('errorText');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const spinner = document.getElementById('spinner');
+        
+        // Validation functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function validatePassword(password) {
+            const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+            return re.test(password);
+        }
+        
+        function validatePhone(phone) {
+            const re = /^[\+]?[0-9\s\-\(\)]{8,}$/;
+            return re.test(phone.trim());
+        }
+        
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorSpan = document.getElementById(fieldId + 'Error');
+            field.classList.add('border-red-500');
+            field.classList.remove('border-gray-300');
+            errorSpan.textContent = message;
+            errorSpan.classList.remove('hidden');
+        }
+        
+        function clearError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorSpan = document.getElementById(fieldId + 'Error');
+            field.classList.remove('border-red-500');
+            field.classList.add('border-gray-300');
+            errorSpan.classList.add('hidden');
+        }
+        
+        function showMessage(type, message) {
+            const messageElement = type === 'error' ? errorMessage : successMessage;
+            const otherMessage = type === 'error' ? successMessage : errorMessage;
+            
+            otherMessage.classList.remove('show');
+            
+            if (type === 'error') {
+                errorText.textContent = message;
+            }
+            
+            messageElement.classList.add('show');
+            
+            setTimeout(() => {
+                messageElement.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Real-time validation
+        document.getElementById('email').addEventListener('blur', function() {
+            if (this.value && !validateEmail(this.value)) {
+                showError('email', 'Veuillez entrer une adresse e-mail valide');
+            } else {
+                clearError('email');
+            }
+        });
+        
+        document.getElementById('telephone').addEventListener('blur', function() {
+            if (this.value && !validatePhone(this.value)) {
+                showError('telephone', 'Veuillez entrer un numéro de téléphone valide');
+            } else {
+                clearError('telephone');
+            }
+        });
+        
+        document.getElementById('motdepasse').addEventListener('blur', function() {
+            if (this.value && !validatePassword(this.value)) {
+                showError('motdepasse', 'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre');
+            } else {
+                clearError('motdepasse');
+            }
+        });
+        
+        document.getElementById('confirmMotdepasse').addEventListener('blur', function() {
+            const password = document.getElementById('motdepasse').value;
+            if (this.value && this.value !== password) {
+                showError('confirmMotdepasse', 'Les mots de passe ne correspondent pas');
+            } else {
+                clearError('confirmMotdepasse');
+            }
+        });
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Clear all previous errors
+            ['nom', 'prenom', 'email', 'telephone', 'motdepasse', 'confirmMotdepasse'].forEach(clearError);
+
+            const formData = new FormData(form);
+
+            submitBtn.disabled = true;
+            btnText.textContent = 'Création en cours...';
+            spinner.classList.remove('hidden');
+
+            fetch('/authentifie/InscriptionPost/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Créer mon compte';
+                spinner.classList.add('hidden');
+
+                if (data.success) {
+                    showMessage('success', data.message);
+                    form.reset();
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 2000);
+                } else if (data.errors) {
+                    Object.entries(data.errors).forEach(([field, message]) => {
+                        if (document.getElementById(field + 'Error')) {
+                            showError(field, message);
+                        } else {
+                            showMessage('error', message);
+                        }
+                    });
+                    showMessage('error', 'Veuillez corriger les erreurs dans le formulaire');
+                }
+            })
+            .catch(() => {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Créer mon compte';
+                spinner.classList.add('hidden');
+                showMessage('error', 'Erreur serveur, veuillez réessayer.');
+            });
+        });
+        
+        // Add smooth focus effects
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('transform', 'scale-[1.02]');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('transform', 'scale-[1.02]');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Promotions - Tokos{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-danger text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="fas fa-fire me-3"></i>Les prix ont été cassés 🔥
+        </h1>
+        <p class="lead mb-4">Profitez de nos réductions exceptionnelles sur une sélection de produits !</p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="bg-white bg-opacity-25 rounded p-3">
+                    <p class="mb-0 fw-bold">⚡ Offres limitées dans le temps ⚡</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item active">Promotions</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Promotions Stats -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-percentage fa-2x mb-2"></i>
+                    <h4>Jusqu'à -50%</h4>
+                    <p class="mb-0">De réduction</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4>Offre limitée</h4>
+                    <p class="mb-0">Dépêchez-vous !</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-shipping-fast fa-2x mb-2"></i>
+                    <h4>Livraison</h4>
+                    <p class="mb-0">Gratuite dès 25000F</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-tags fa-2x mb-2"></i>
+                    <h4>{{ page_obj.paginator.count }}</h4>
+                    <p class="mb-0">Produits en promo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products in Promotion -->
+    {% if page_obj %}
+    <div class="row">
+        {% for item in page_obj %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card product-card border-0 shadow-sm h-100 promo-card">
+                <div class="position-relative">
+                    <img src="{% static 'images/products/default.jpg' %}" class="card-img-top" alt="{{ item.produit.nom }}">
+                    
+                    <!-- Promotion Badge -->
+                    <div class="position-absolute top-0 start-0">
+                        <span class="badge bg-danger fs-4 m-2 pulse-animation">
+                            -{{ item.pourcentage }}%
+                        </span>
+                    </div>
+                    
+                    <!-- Hot Deal Badge -->
+                    {% if item.pourcentage >= 30 %}
+                    <div class="position-absolute top-0 end-0">
+                        <span class="badge bg-warning text-dark m-2">
+                            <i class="fas fa-fire me-1"></i>HOT!
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Stock Badge -->
+                    {% if item.produit.stock < 5 %}
+                    <div class="position-absolute bottom-0 start-0">
+                        <span class="badge bg-warning text-dark m-2">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Stock limité
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold">{{ item.produit.nom }}</h5>
+                    <p class="card-text text-muted flex-grow-1">{{ item.produit.description|truncatechars:80 }}</p>
+                    
+                    <!-- Price Section with Animation -->
+                    <div class="price-section mb-3 text-center">
+                        <div class="old-price mb-1">
+                            <span class="text-decoration-line-through text-muted fs-6">
+                                {{ item.prix_original|floatformat:0 }} FCFA
+                            </span>
+                        </div>
+                        <div class="new-price">
+                            <span class="text-danger fw-bold fs-3 price-highlight">
+                                {{ item.prix_reduit|floatformat:0 }} FCFA
+                            </span>
+                        </div>
+                        <div class="savings mt-1">
+                            <small class="text-success fw-bold">
+                                Vous économisez {{ item.prix_original|floatformat:0|add:"-"|add:item.prix_reduit|floatformat:0 }} FCFA !
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="product-details mb-3">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-box me-1"></i>{{ item.produit.stock }} en stock
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-star me-1 text-warning"></i>{{ item.produit.categorie.nom }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vendor Info -->
+                    <div class="mb-3 text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-store me-1"></i>Vendu par {{ item.produit.vendeur.nom }} {{ item.produit.vendeur.prenom }}
+                        </small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-auto">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'detail_produit' item.produit.id %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-eye me-1"></i>Voir détails
+                            </a>
+                            
+                            {% if user.is_authenticated %}
+                                {% if item.produit.stock > 0 %}
+                                <form method="post" action="{% url 'ajouter_au_panier' item.produit.id %}">
+                                    {% csrf_token %}
+                                    <div class="input-group mb-2">
+                                        <input type="number" class="form-control" name="quantite" value="1" min="1" max="{{ item.produit.stock }}">
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-cart-plus me-1"></i>Ajouter
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <!-- Quick Buy Button -->
+                                <button class="btn btn-success btn-sm w-100 quick-buy-btn" 
+                                        data-produit-id="{{ item.produit.id }}">
+                                    <i class="fas fa-lightning-bolt me-1"></i>Achat express
+                                </button>
+                                {% else %}
+                                <button class="btn btn-secondary btn-sm w-100" disabled>
+                                    <i class="fas fa-times me-1"></i>Rupture de stock
+                                </button>
+                                {% endif %}
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-danger">
+                                <i class="fas fa-sign-in-alt me-1"></i>Se connecter pour acheter
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Promotions pagination" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                    <i class="fas fa-chevron-left"></i> Précédent
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                    Suivant <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No Promotions Found -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-percentage fa-4x text-muted"></i>
+        </div>
+        <h3>Aucune promotion en cours</h3>
+        <p class="text-muted mb-4">Revenez bientôt pour découvrir nos nouvelles offres !</p>
+        <a href="{% url 'produits' %}" class="btn btn-primary">
+            <i class="fas fa-box me-1"></i>Voir tous les produits
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Call to Action Section -->
+    <section class="bg-light rounded p-5 my-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3">Ne ratez aucune promotion !</h3>
+                <p class="mb-0">Inscrivez-vous à notre newsletter pour être informé en avant-première de nos offres spéciales.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#newsletterModal">
+                    <i class="fas fa-envelope me-2"></i>S'inscrire
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Newsletter Modal -->
+<div class="modal fade" id="newsletterModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-envelope me-2"></i>Newsletter Tokos</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newsletterForm">
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nom (optionnel)</label>
+                        <input type="text" class="form-control">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                        <label class="form-check-label" for="acceptTerms">
+                            J'accepte de recevoir des offres promotionnelles par email
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" form="newsletterForm" class="btn btn-danger">
+                    <i class="fas fa-paper-plane me-1"></i>S'inscrire
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.promo-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.price-highlight {
+    text-shadow: 2px 2px 4px rgba(220, 53, 69, 0.3);
+    animation: priceGlow 3s ease-in-out infinite;
+}
+
+@keyframes priceGlow {
+    0%, 100% { color: #dc3545; }
+    50% { color: #ff1744; }
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.quick-buy-btn {
+    transition: all 0.3s ease;
+}
+
+.quick-buy-btn:hover {
+    transform: scale(1.02);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quick buy functionality
+    document.querySelectorAll('.quick-buy-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const produitId = this.getAttribute('data-produit-id');
+            // Add to cart and redirect to checkout
+            fetch(`/ajouter-au-panier/${produitId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'quantite=1'
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/panier/';
+                }
+            });
+        });
+    });
+
+    // Newsletter form submission
+    document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Simulate successful subscription
+        alert('Merci ! Vous êtes maintenant inscrit à notre newsletter.');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newsletterModal'));
+        modal.hide();
+    });
+
+    // Auto-show promo modal on page load (with delay)
+    setTimeout(function() {
+        const promoModal = new bootstrap.Modal(document.getElementById('promoModal'));
+        // Only show if user hasn't seen it in this session
+        if (!sessionStorage.getItem('promoModalShown')) {
+            promoModal.show();
+            sessionStorage.setItem('promoModalShown', 'true');
+        }
+    }, 3000);
+});
+
+// Countdown timer for promotions (example)
+function startCountdown() {
+    const countdownElements = document.querySelectorAll('.countdown');
+    countdownElements.forEach(element => {
+        const endTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 hours from now
+        
+        const timer = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+            
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            element.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+            
+            if (distance < 0) {
+                clearInterval(timer);
+                element.innerHTML = "EXPIRÉ";
+            }
+        }, 1000);
+    });
+}
+
+// Start countdown on page load
+startCountdown();
+</script>
+{% endblock %}

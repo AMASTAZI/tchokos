@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil - Tchokos{% endblock %}
+
+{% block content %}
+<!-- Hero Carousel -->
+<section class="hero-section">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+        
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="hero-slide bg-gradient-primary">
+                    <div class="container">
+                        <div class="row align-items-center min-vh-50">
+                            <div class="col-lg-6 text-white">
+                                <h1 class="display-4 fw-bold mb-4">Bienvenue sur Tchokos</h1>
+                                <p class="lead mb-4">C'est difficile, mais c'est possible. Découvrez notre sélection de produits de qualité.</p>
+                                <a href="{% url 'produits' %}" class="btn btn-light btn-lg">
+                                    <i class="fas fa-shopping-bag me-2"></i>Achetez maintenant
+                                </a>
+                            </div>
+                            <div class="col-lg-6">
+                                <img src="{% static 'images/hero-1.jpg' %}" alt="Hero 1" class="img-fluid rounded shadow">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="carousel-item">
+                <div class="hero-slide bg-gradient-success">
+                    <div class="container">
+                        <div class="row align-items-center min-vh-50">
+                            <div class="col-lg-6 text-white">
+                                <h1 class="display-4 fw-bold mb-4">Promotions Exceptionnelles</h1>
+                                <p class="lead mb-4">Jusqu'à -50% sur une sélection de produits. Offres limitées !</p>
+                                <a href="{% url 'promotions' %}" class="btn btn-light btn-lg">
+                                    <i class="fas fa-fire me-2"></i>Voir les promos
+                                </a>
+                            </div>
+                            <div class="col-lg-6">
+                                <img src="{% static 'images/hero-2.jpg' %}" alt="Promotions" class="img-fluid rounded shadow">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="carousel-item">
+                <div class="hero-slide bg-gradient-warning">
+                    <div class="container">
+                        <div class="row align-items-center min-vh-50">
+                            <div class="col-lg-6 text-dark">
+                                <h1 class="display-4 fw-bold mb-4">Livraison Rapide</h1>
+                                <p class="lead mb-4">Recevez vos commandes en 24-48h partout au Cameroun.</p>
+                                <a href="{% url 'produits' %}" class="btn btn-dark btn-lg">
+                                    <i class="fas fa-truck me-2"></i>Commander maintenant
+                                </a>
+                            </div>
+                            <div class="col-lg-6">
+                                <img src="{% static 'images/hero-3.jpg' %}" alt="Livraison" class="img-fluid rounded shadow">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Nos Catégories</h2>
+            <p class="text-muted">Découvrez nos différentes gammes de produits</p>
+        </div>
+        
+        <div class="row">
+            {% for categorie in categories %}
+            <div class="col-lg-2 col-md-4 col-6 mb-4">
+                <a href="{% url 'produits' %}?categorie={{ categorie.id }}" class="text-decoration-none">
+                    <div class="card category-card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center py-4">
+                            <div class="category-icon mb-3">
+                                {% if 'vêtement' in categorie.nom|lower %}
+                                    <i class="fas fa-tshirt fa-3x text-primary"></i>
+                                {% elif 'chaussure' in categorie.nom|lower %}
+                                    <i class="fas fa-shoe-prints fa-3x text-success"></i>
+                                {% elif 'sac' in categorie.nom|lower %}
+                                    <i class="fas fa-shopping-bag fa-3x text-warning"></i>
+                                {% elif 'drap' in categorie.nom|lower %}
+                                    <i class="fas fa-bed fa-3x text-info"></i>
+                                {% elif 'gourde' in categorie.nom|lower %}
+                                    <i class="fas fa-wine-bottle fa-3x text-danger"></i>
+                                {% else %}
+                                    <i class="fas fa-box fa-3x text-secondary"></i>
+                                {% endif %}
+                            </div>
+                            <h6 class="card-title fw-bold text-dark">{{ categorie.nom }}</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Aucune catégorie disponible</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Promotions Section -->
+{% if produits_promo %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-danger">
+                <i class="fas fa-fire me-2"></i>Offres Spéciales
+            </h2>
+            <a href="{% url 'promotions' %}" class="btn btn-outline-danger">
+                Voir toutes les promos <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="row">
+            {% for item in produits_promo %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card product-card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="{% static 'images/products/default.jpg' %}" class="card-img-top" alt="{{ item.produit.nom }}">
+                        <div class="position-absolute top-0 start-0">
+                            <span class="badge bg-danger fs-6 m-2">-{{ item.pourcentage }}%</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">{{ item.produit.nom|truncatechars:30 }}</h6>
+                        <p class="card-text text-muted small">{{ item.produit.description|truncatechars:50 }}</p>
+                        <div class="price-section mb-3">
+                            <span class="text-decoration-line-through text-muted me-2">{{ item.prix_original|floatformat:0 }} FCFA</span>
+                            <span class="text-danger fw-bold fs-5">{{ item.prix_reduit|floatformat:0 }} FCFA</span>
+                        </div>
+                        <div class="d-grid">
+                            {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'ajouter_au_panier' item.produit.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantite" value="1">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-cart-plus me-1"></i>Ajouter au panier
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-danger">
+                                <i class="fas fa-sign-in-alt me-1"></i>Se connecter
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Nouveautés Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Nouveautés</h2>
+            <a href="{% url 'produits' %}" class="btn btn-outline-primary">
+                Voir tous les produits <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="row">
+            {% for produit in nouveautes %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card product-card border-0 shadow-sm h-100">
+                    <img src="{% static 'images/products/default.jpg' %}" class="card-img-top" alt="{{ produit.nom }}">
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">{{ produit.nom|truncatechars:25 }}</h6>
+                        <p class="card-text text-muted small">{{ produit.description|truncatechars:40 }}</p>
+                        <div class="price-section mb-3">
+                            <span class="text-primary fw-bold fs-5">{{ produit.prix|floatformat:0 }} FCFA</span>
+                        </div>
+                        <div class="d-grid">
+                            {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'ajouter_au_panier' produit.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantite" value="1">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-cart-plus me-1"></i>Ajouter
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-1"></i>Se connecter
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Aucune nouveauté disponible</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Meilleures Ventes Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Meilleures Ventes</h2>
+            <a href="{% url 'produits' %}" class="btn btn-outline-success">
+                Voir tous les produits <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="row">
+            {% for produit in meilleures_ventes %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card product-card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="{% static 'images/products/default.jpg' %}" class="card-img-top" alt="{{ produit.nom }}">
+                        <div class="position-absolute top-0 end-0">
+                            <span class="badge bg-success m-2">
+                                <i class="fas fa-star me-1"></i>Top
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">{{ produit.nom|truncatechars:25 }}</h6>
+                        <p class="card-text text-muted small">{{ produit.description|truncatechars:40 }}</p>
+                        <div class="price-section mb-3">
+                            <span class="text-success fw-bold fs-5">{{ produit.prix|floatformat:0 }} FCFA</span>
+                        </div>
+                        <div class="d-grid">
+                            {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'ajouter_au_panier' produit.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantite" value="1">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-cart-plus me-1"></i>Ajouter
+                                </button>
+                            </form>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-success">
+                                <i class="fas fa-sign-in-alt me-1"></i>Se connecter
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Aucun produit disponible</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h3 class="fw-bold mb-3">Restez informé de nos offres !</h3>
+                <p>Inscrivez-vous à notre newsletter pour recevoir nos dernières promotions.</p>
+            </div>
+            <div class="col-lg-6">
+                <form class="d-flex">
+                    <input type="email" class="form-control me-2" placeholder="Votre email">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fas fa-paper-plane me-1"></i>S'inscrire
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
